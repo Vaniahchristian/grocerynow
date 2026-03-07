@@ -16,6 +16,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# uploads (stored on VPS, not in repo)
+backend/uploads/
+
 # env files
 .env*
 
