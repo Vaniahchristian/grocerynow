@@ -210,25 +210,25 @@ export function ProductManagement() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
-          <p className="text-gray-600">Manage your store products</p>
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 px-1 sm:px-0">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl lg:text-3xl">Product Management</h1>
+          <p className="text-sm text-gray-600 sm:text-base">Manage your store products</p>
         </div>
-        <Button onClick={() => setShowAddForm(true)} className="bg-green-600 hover:bg-green-700 rounded-lg">
-          <Plus className="w-4 h-4 mr-2" />
+        <Button onClick={() => setShowAddForm(true)} className="w-full sm:w-auto bg-green-600 hover:bg-green-700 rounded-lg shrink-0">
+          <Plus className="w-4 h-4 mr-2 shrink-0" />
           Add Product
         </Button>
       </div>
 
       {(showAddForm || editingProduct) && (
         <Card ref={formRef} className="rounded-xl">
-          <CardHeader>
-            <CardTitle>{editingProduct ? "Edit Product" : "Add New Product"}</CardTitle>
+          <CardHeader className="px-4 sm:px-6">
+            <CardTitle className="text-base sm:text-lg">{editingProduct ? "Edit Product" : "Add New Product"}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CardContent className="px-4 sm:px-6">
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="name">Product Name</Label>
                 <Input
@@ -297,8 +297,8 @@ export function ProductManagement() {
                 <Label>Variants (optional)</Label>
                 <div className="space-y-3">
                   {(formData.variants ?? []).map((v: any, idx) => (
-                    <div key={idx} className="grid grid-cols-1 md:grid-cols-5 gap-2 items-end">
-                      <div>
+                    <div key={idx} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 items-end">
+                      <div className="min-w-0">
                         <Label className="text-xs">Label</Label>
                         <Input
                           value={v?.label ?? ""}
@@ -310,7 +310,7 @@ export function ProductManagement() {
                           placeholder="e.g., 500g"
                         />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <Label className="text-xs">Unit</Label>
                         <Input
                           value={v?.unit ?? ""}
@@ -322,7 +322,7 @@ export function ProductManagement() {
                           placeholder="e.g., per pack"
                         />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <Label className="text-xs">Price</Label>
                         <Input
                           type="number"
@@ -338,10 +338,12 @@ export function ProductManagement() {
                         />
                       </div>
                       
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 sm:col-span-2 md:col-span-1">
                         <Button
                           type="button"
                           variant="outline"
+                          size="sm"
+                          className="w-full sm:w-auto"
                           onClick={() => {
                             const variants = (formData.variants ?? []).filter((_: any, i: number) => i !== idx)
                             setFormData({ ...formData, variants })
@@ -413,7 +415,7 @@ export function ProductManagement() {
                 <Label className="mt-4">Additional Image URLs (optional)</Label>
                 <div className="space-y-2">
                   {(formData.images ?? []).map((url, idx) => (
-                    <div key={idx} className="flex gap-2">
+                    <div key={idx} className="flex flex-col sm:flex-row gap-2 min-w-0">
                       <Input
                         value={url}
                         onChange={(e) => {
@@ -422,10 +424,13 @@ export function ProductManagement() {
                           setFormData({ ...formData, images })
                         }}
                         placeholder="https://..."
+                        className="min-w-0"
                       />
                       <Button
                         type="button"
                         variant="outline"
+                        size="sm"
+                        className="shrink-0 w-full sm:w-auto"
                         onClick={() => {
                           const images = (formData.images ?? []).filter((_, i) => i !== idx)
                           setFormData({ ...formData, images })
@@ -458,11 +463,11 @@ export function ProductManagement() {
                 </select>
               </div>
 
-              <div className="md:col-span-2 flex items-center space-x-4">
-                <Button type="submit" disabled={loading} className="bg-green-600 hover:bg-green-700 rounded-lg">
+              <div className="md:col-span-2 flex flex-col-reverse sm:flex-row gap-2 sm:gap-4">
+                <Button type="submit" disabled={loading} className="bg-green-600 hover:bg-green-700 rounded-lg w-full sm:w-auto">
                   {loading ? 'Saving...' : (editingProduct ? "Update Product" : "Add Product")}
                 </Button>
-                <Button type="button" variant="outline" onClick={handleCancel} className="rounded-lg bg-transparent" disabled={loading}>
+                <Button type="button" variant="outline" onClick={handleCancel} className="rounded-lg bg-transparent w-full sm:w-auto" disabled={loading}>
                   Cancel
                 </Button>
               </div>
@@ -472,11 +477,11 @@ export function ProductManagement() {
       )}
 
       <Card className="rounded-xl">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Products ({filteredProducts.length})</CardTitle>
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <CardHeader className="px-4 sm:px-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <CardTitle className="text-base sm:text-lg">Products ({filteredProducts.length})</CardTitle>
+            <div className="relative w-full sm:w-64 min-w-0">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
               <Input
                 placeholder="Search products..."
                 value={searchTerm}
@@ -486,7 +491,7 @@ export function ProductManagement() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6">
           {listError ? (
             offline ? (
               <NoInternet onRetry={fetchProducts} />
@@ -494,9 +499,9 @@ export function ProductManagement() {
               <div className="text-center py-8 text-red-600">{listError}</div>
             )
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredProducts.map((product) => (
-                <Card key={product.id} className="overflow-hidden">
+                <Card key={product.id} className="overflow-hidden min-w-0">
                   <div className="aspect-square bg-gray-100">
                     <img
                       src={getImageUrl(product.image)}
@@ -508,35 +513,36 @@ export function ProductManagement() {
                       }}
                     />
                   </div>
-                  <div className="p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 mb-1">{product.name}</h3>
+                  <div className="p-3 sm:p-4">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base truncate" title={product.name}>{product.name}</h3>
                         <Badge variant="outline" className="text-xs mb-2">
                           {product.category}
                         </Badge>
                       </div>
-                      <div className="flex space-x-1">
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(product)} className="rounded-lg">
+                      <div className="flex shrink-0 gap-1">
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(product)} className="rounded-lg h-8 w-8 p-0" aria-label="Edit">
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDelete(product.id)}
-                          className="text-red-600 hover:text-red-700 rounded-lg"
+                          className="text-red-600 hover:text-red-700 rounded-lg h-8 w-8 p-0"
+                          aria-label="Delete"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{product.description}</p>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-lg font-bold text-green-600">UGX {product.price.toLocaleString()}</span>
-                        <span className="text-sm text-gray-500 ml-1">{product.unit}</span>
+                    <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2 min-w-0">{product.description}</p>
+                    <div className="flex flex-wrap items-center justify-between gap-1">
+                      <div className="min-w-0">
+                        <span className="text-base sm:text-lg font-bold text-green-600">UGX {product.price.toLocaleString()}</span>
+                        <span className="text-xs sm:text-sm text-gray-500 ml-1">{product.unit}</span>
                       </div>
-                      <Badge variant={product.inStock ? "default" : "secondary"}>
+                      <Badge variant={product.inStock ? "default" : "secondary"} className="text-xs shrink-0">
                         {product.inStock ? "In Stock" : "Out of Stock"}
                       </Badge>
                     </div>
