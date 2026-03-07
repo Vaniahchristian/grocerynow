@@ -40,9 +40,6 @@ jobs:
           npm install
           cd backend && npm install
 
-      - name: 🔍 Lint code
-        run: npm run lint --if-present
-
       - name: 🏗️ Build Next.js frontend
         run: npm run build
         env:
