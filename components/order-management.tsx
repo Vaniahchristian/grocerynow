@@ -1,16 +1,27 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import type { Order } from "@/lib/types"
-import { Search, Eye, CheckCircle, Clock, Truck, Trash2, AlertTriangle } from "lucide-react"
+import { Search, Eye, CheckCircle, Clock, Truck, Trash2, AlertTriangle, FileSpreadsheet, FileText, Filter, X } from "lucide-react"
 import { NoInternet } from "@/components/no-internet"
 import { isOfflineError } from "@/lib/network"
 import { listOrders, updateOrderStatusApi, deleteOrderApi, deleteAllOrdersApi } from "@/lib/orderapi"
 import type { OrderResponse } from "@/lib/orderapi"
+import { format, startOfMonth, endOfMonth, startOfDay, endOfDay, subMonths, isWithinInterval, parseISO } from "date-fns"
+import * as XLSX from "xlsx"
+import { jsPDF } from "jspdf"
+import autoTable from "jspdf-autotable"
 
 const toOrder = (r: OrderResponse): Order => ({
   id: String(r.id),
@@ -32,6 +43,22 @@ const toOrder = (r: OrderResponse): Order => ({
   createdAt: r.createdAt,
 })
 
+// Build month options: All time + last 12 months
+function getMonthOptions(): { value: string; label: string }[] {
+  const options = [{ value: "", label: "All time" }]
+  const now = new Date()
+  for (let i = 0; i < 12; i++) {
+    const d = subMonths(now, i)
+    options.push({
+      value: format(d, "yyyy-MM"),
+      label: format(d, "MMMM yyyy"),
+    })
+  }
+  return options
+}
+
+const MONTH_OPTIONS = getMonthOptions()
+
 export function OrderManagement() {
   const [orders, setOrders] = useState<Order[]>([])
   const [searchTerm, setSearchTerm] = useState("")
@@ -40,6 +67,11 @@ export function OrderManagement() {
   const [listError, setListError] = useState<string | null>(null)
   const [offline, setOffline] = useState(false)
   const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false)
+  // Filters
+  const [filterMonth, setFilterMonth] = useState("")
+  const [filterDateFrom, setFilterDateFrom] = useState("")
+  const [filterDateTo, setFilterDateTo] = useState("")
+  const [filterStatus, setFilterStatus] = useState("")
 
   // Fetch orders from backend
   const fetchOrders = async () => {
@@ -66,12 +98,38 @@ export function OrderManagement() {
     fetchOrders()
   }, [])
 
-  const filteredOrders = orders.filter(
-    (order) =>
-      (order.customerName && order.customerName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (order.id && order.id.toString().toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (order.phone && order.phone.includes(searchTerm)),
-  )
+  const filteredOrders = useMemo(() => {
+    return orders.filter((order) => {
+      // Search
+      const matchesSearch =
+        !searchTerm ||
+        (order.customerName && order.customerName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (order.id && order.id.toString().toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (order.phone && order.phone.includes(searchTerm))
+      if (!matchesSearch) return false
+
+      // Status
+      if (filterStatus && order.status !== filterStatus) return false
+
+      // Date filters
+      const orderDate = parseISO(order.createdAt)
+      if (filterMonth) {
+        const [y, m] = filterMonth.split("-").map(Number)
+        const monthStart = startOfMonth(new Date(y, m - 1))
+        const monthEnd = endOfMonth(new Date(y, m - 1))
+        if (!isWithinInterval(orderDate, { start: monthStart, end: monthEnd })) return false
+      }
+      if (filterDateFrom) {
+        const from = startOfDay(parseISO(filterDateFrom))
+        if (orderDate < from) return false
+      }
+      if (filterDateTo) {
+        const to = endOfDay(parseISO(filterDateTo))
+        if (orderDate > to) return false
+      }
+      return true
+    })
+  }, [orders, searchTerm, filterMonth, filterDateFrom, filterDateTo, filterStatus])
 
   const updateOrderStatus = async (orderId: string | number, status: Order["status"]) => {
     try {
@@ -146,6 +204,58 @@ export function OrderManagement() {
     }
   }
 
+  const hasActiveFilters = filterMonth || filterDateFrom || filterDateTo || filterStatus
+
+  const clearFilters = () => {
+    setFilterMonth("")
+    setFilterDateFrom("")
+    setFilterDateTo("")
+    setFilterStatus("")
+  }
+
+  const exportToExcel = () => {
+    const rows = filteredOrders.map((order) => ({
+      "Order ID": order.id,
+      Customer: order.customerName,
+      Phone: order.phone,
+      Location: order.location,
+      Status: order.status,
+      Date: format(parseISO(order.createdAt), "yyyy-MM-dd HH:mm"),
+      Items: order.items.length,
+      Subtotal: order.subtotal ?? "",
+      "Delivery Fee": order.deliveryFee ?? "",
+      Total: order.total,
+    }))
+    const ws = XLSX.utils.json_to_sheet(rows)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, "Orders")
+    XLSX.writeFile(wb, `orders-${format(new Date(), "yyyy-MM-dd")}.xlsx`)
+  }
+
+  const exportToPdf = () => {
+    const doc = new jsPDF({ orientation: "landscape" })
+    doc.setFontSize(14)
+    doc.text("Order Management – Grocery Now", 14, 15)
+    doc.setFontSize(10)
+    doc.text(`Exported: ${format(new Date(), "PPpp")} • ${filteredOrders.length} order(s)`, 14, 22)
+    const tableData = filteredOrders.map((order) => [
+      order.id,
+      order.customerName,
+      order.phone,
+      format(parseISO(order.createdAt), "MM/dd/yyyy"),
+      order.status,
+      `UGX ${order.total.toLocaleString()}`,
+    ])
+    autoTable(doc, {
+      startY: 28,
+      head: [["Order ID", "Customer", "Phone", "Date", "Status", "Total"]],
+      body: tableData,
+      theme: "grid",
+      headStyles: { fillColor: [34, 197, 94] },
+    })
+    doc.save(`orders-${format(new Date(), "yyyy-MM-dd")}.pdf`)
+  }
+
   const getStatusIcon = (status: Order["status"]) => {
     switch (status) {
       case "pending":
@@ -175,7 +285,7 @@ export function OrderManagement() {
           <h1 className="text-3xl font-bold text-gray-900">Order Management</h1>
           <p className="text-gray-600">Track and manage customer orders</p>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center flex-wrap gap-3">
           <div className="relative w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
@@ -185,6 +295,26 @@ export function OrderManagement() {
               className="pl-10"
             />
           </div>
+          {filteredOrders.length > 0 && (
+            <>
+              <Button
+                variant="outline"
+                onClick={exportToExcel}
+                className="flex items-center space-x-2 border-green-200 text-green-700 hover:bg-green-50"
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                <span>Export Excel</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={exportToPdf}
+                className="flex items-center space-x-2 border-red-200 text-red-700 hover:bg-red-50"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Export PDF</span>
+              </Button>
+            </>
+          )}
           {orders.length > 0 && (
             <Button
               variant="destructive"
@@ -198,6 +328,71 @@ export function OrderManagement() {
           )}
         </div>
       </div>
+
+      {/* Filters: month, date range, status */}
+      <Card className="rounded-xl">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Filter className="w-4 h-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700">Filters</span>
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="text-gray-500 hover:text-gray-700">
+                <X className="w-4 h-4 mr-1" />
+                Clear filters
+              </Button>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-600 whitespace-nowrap">Month</label>
+              <Select value={filterMonth || "__all__"} onValueChange={(v) => setFilterMonth(v === "__all__" ? "" : v)}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="All time" />
+                </SelectTrigger>
+                <SelectContent>
+                  {MONTH_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value || "all"} value={opt.value || "__all__"}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-600 whitespace-nowrap">From</label>
+              <Input
+                type="date"
+                value={filterDateFrom}
+                onChange={(e) => setFilterDateFrom(e.target.value)}
+                className="w-[140px]"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-600 whitespace-nowrap">To</label>
+              <Input
+                type="date"
+                value={filterDateTo}
+                onChange={(e) => setFilterDateTo(e.target.value)}
+                className="w-[140px]"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-600 whitespace-nowrap">Status</label>
+              <Select value={filterStatus || "__all__"} onValueChange={(v) => setFilterStatus(v === "__all__" ? "" : v)}>
+                <SelectTrigger className="w-[130px]">
+                  <SelectValue placeholder="All statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">All statuses</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="delivered">Delivered</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
