@@ -16,8 +16,9 @@ import upload from './upload-middleware.js';
 import cartroutes from './cartroutes.js';
 
 // Load .env from backend directory (so it works when run from project root or backend/)
+// override: true so .env wins over empty vars PM2/shell may set (e.g. on VPS)
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(__dirname, '.env') });
+dotenv.config({ path: path.join(__dirname, '.env'), override: true });
 
 if (process.env.NODE_ENV === 'production') {
   console.log = () => {};
