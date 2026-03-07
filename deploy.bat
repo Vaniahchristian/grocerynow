@@ -7,5 +7,5 @@ if not exist "%GITBASH%" (
   exit /b 1
 )
 cd /d "%~dp0"
-"%GITBASH%" -l deploy.sh
+"%GITBASH%" -l -c "./deploy.sh"
 pause

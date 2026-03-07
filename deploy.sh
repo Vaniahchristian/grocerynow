@@ -5,13 +5,13 @@ set -e
 VPS_HOST="187.124.35.119"
 VPS_USER="root"
 VPS_PASS="070012Tytus@"
-REPO_URL="https://github.com/Vaniahchristian/century-groceries-store_3.git"
+REPO_URL="https://github.com/Vaniahchristian/grocerynow.git"
 DOMAIN="grocerynowstore.com"
 DB_NAME="grocery_now"
 DB_USER="grocery_user"
 DB_PASSWORD="0754092850@Vc"
 
-DEPLOY_DIR="/var/www/century-groceries"
+DEPLOY_DIR="/var/www/grocerynow"
 
 echo "=== Uploading SQL backup to VPS ==="
 if command -v sshpass &>/dev/null; then
@@ -27,8 +27,8 @@ $RUN_SSH "bash -s" << 'REMOTE_SCRIPT'
 set -e
 export DEBIAN_FRONTEND=noninteractive
 
-VPS_DEPLOY_DIR="/var/www/century-groceries"
-REPO_URL="https://github.com/Vaniahchristian/century-groceries-store_3.git"
+VPS_DEPLOY_DIR="/var/www/grocerynow"
+REPO_URL="https://github.com/Vaniahchristian/grocerynow.git"
 DOMAIN="grocerynowstore.com"
 DB_NAME="grocery_now"
 DB_USER="grocery_user"
@@ -90,6 +90,7 @@ cd backend && npm ci --omit=dev && cd ..
 echo "NEXT_PUBLIC_SITE_URL=https://${DOMAIN}" > .env.local
 echo "NEXT_PUBLIC_API_URL=/api" >> .env.local
 
+rm -rf .next
 npm ci --omit=dev && npm run build
 
 echo "=== PM2: backend and frontend ==="
