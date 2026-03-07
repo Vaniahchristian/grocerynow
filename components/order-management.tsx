@@ -279,14 +279,14 @@ export function OrderManagement() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Order Management</h1>
-          <p className="text-gray-600">Track and manage customer orders</p>
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 px-1 sm:px-0">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl lg:text-3xl">Order Management</h1>
+          <p className="text-sm text-gray-600 sm:text-base">Track and manage customer orders</p>
         </div>
-        <div className="flex items-center flex-wrap gap-3">
-          <div className="relative w-64">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               placeholder="Search orders..."
@@ -295,45 +295,50 @@ export function OrderManagement() {
               className="pl-10"
             />
           </div>
-          {filteredOrders.length > 0 && (
-            <>
+          <div className="flex flex-wrap gap-2 sm:gap-3">
+            {filteredOrders.length > 0 && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={exportToExcel}
+                  size="sm"
+                  className="flex flex-1 min-w-0 sm:flex-initial items-center justify-center gap-1.5 border-green-200 text-green-700 hover:bg-green-50 text-xs sm:text-sm"
+                >
+                  <FileSpreadsheet className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                  <span className="truncate">Excel</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={exportToPdf}
+                  size="sm"
+                  className="flex flex-1 min-w-0 sm:flex-initial items-center justify-center gap-1.5 border-red-200 text-red-700 hover:bg-red-50 text-xs sm:text-sm"
+                >
+                  <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                  <span className="truncate">PDF</span>
+                </Button>
+              </>
+            )}
+            {orders.length > 0 && (
               <Button
-                variant="outline"
-                onClick={exportToExcel}
-                className="flex items-center space-x-2 border-green-200 text-green-700 hover:bg-green-50"
+                variant="destructive"
+                onClick={() => setShowDeleteAllConfirm(true)}
+                disabled={loading}
+                size="sm"
+                className="flex flex-1 min-w-0 sm:flex-initial items-center justify-center gap-1.5 text-xs sm:text-sm"
               >
-                <FileSpreadsheet className="w-4 h-4" />
-                <span>Export Excel</span>
+                <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <span className="truncate">Delete All</span>
               </Button>
-              <Button
-                variant="outline"
-                onClick={exportToPdf}
-                className="flex items-center space-x-2 border-red-200 text-red-700 hover:bg-red-50"
-              >
-                <FileText className="w-4 h-4" />
-                <span>Export PDF</span>
-              </Button>
-            </>
-          )}
-          {orders.length > 0 && (
-            <Button
-              variant="destructive"
-              onClick={() => setShowDeleteAllConfirm(true)}
-              disabled={loading}
-              className="flex items-center space-x-2"
-            >
-              <Trash2 className="w-4 h-4" />
-              <span>Delete All</span>
-            </Button>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
       {/* Filters: month, date range, status */}
       <Card className="rounded-xl">
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-2 mb-3">
-            <Filter className="w-4 h-4 text-gray-500" />
+        <CardContent className="pt-4 sm:pt-6 px-4 sm:px-6">
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <Filter className="w-4 h-4 text-gray-500 shrink-0" />
             <span className="text-sm font-medium text-gray-700">Filters</span>
             {hasActiveFilters && (
               <Button variant="ghost" size="sm" onClick={clearFilters} className="text-gray-500 hover:text-gray-700">
@@ -342,11 +347,11 @@ export function OrderManagement() {
               </Button>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-center gap-3 lg:gap-4">
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
               <label className="text-sm text-gray-600 whitespace-nowrap">Month</label>
               <Select value={filterMonth || "__all__"} onValueChange={(v) => setFilterMonth(v === "__all__" ? "" : v)}>
-                <SelectTrigger className="w-[160px]">
+                <SelectTrigger className="w-full sm:w-[160px]">
                   <SelectValue placeholder="All time" />
                 </SelectTrigger>
                 <SelectContent>
@@ -358,28 +363,28 @@ export function OrderManagement() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
               <label className="text-sm text-gray-600 whitespace-nowrap">From</label>
               <Input
                 type="date"
                 value={filterDateFrom}
                 onChange={(e) => setFilterDateFrom(e.target.value)}
-                className="w-[140px]"
+                className="w-full sm:w-[140px]"
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
               <label className="text-sm text-gray-600 whitespace-nowrap">To</label>
               <Input
                 type="date"
                 value={filterDateTo}
                 onChange={(e) => setFilterDateTo(e.target.value)}
-                className="w-[140px]"
+                className="w-full sm:w-[140px]"
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
               <label className="text-sm text-gray-600 whitespace-nowrap">Status</label>
               <Select value={filterStatus || "__all__"} onValueChange={(v) => setFilterStatus(v === "__all__" ? "" : v)}>
-                <SelectTrigger className="w-[130px]">
+                <SelectTrigger className="w-full sm:w-[130px]">
                   <SelectValue placeholder="All statuses" />
                 </SelectTrigger>
                 <SelectContent>
@@ -394,13 +399,13 @@ export function OrderManagement() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+        <div className="lg:col-span-2 min-w-0">
           <Card className="rounded-xl">
-            <CardHeader>
-              <CardTitle>Orders ({filteredOrders.length})</CardTitle>
+            <CardHeader className="px-4 sm:px-6">
+              <CardTitle className="text-base sm:text-lg">Orders ({filteredOrders.length})</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 sm:px-6">
               {listError ? (
                 offline ? (
                   <NoInternet onRetry={fetchOrders} />
@@ -418,36 +423,36 @@ export function OrderManagement() {
                   <p>No orders found.</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {filteredOrders.map((order) => (
                   <div
                     key={order.id}
-                    className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+                    className="border rounded-lg p-3 sm:p-4 hover:bg-gray-50 cursor-pointer active:bg-gray-100"
                     onClick={() => setSelectedOrder(order)}
                   >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-3">
-                        <h3 className="font-semibold text-gray-900">{order.id}</h3>
-                        <Badge className={getStatusColor(order.status)}>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
+                      <div className="flex flex-wrap items-center gap-2 sm:space-x-3">
+                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">#{order.id}</h3>
+                        <Badge className={`${getStatusColor(order.status)} text-xs w-fit`}>
                           <div className="flex items-center space-x-1">
                             {getStatusIcon(order.status)}
                             <span className="capitalize">{order.status}</span>
                           </div>
                         </Badge>
                       </div>
-                      <span className="text-lg font-bold text-green-600">UGX {order.total.toLocaleString()}</span>
+                      <span className="text-base sm:text-lg font-bold text-green-600">UGX {order.total.toLocaleString()}</span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                      <div>
-                        <p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
+                      <div className="min-w-0">
+                        <p className="truncate" title={order.customerName}>
                           <strong>Customer:</strong> {order.customerName}
                         </p>
                         <p>
                           <strong>Phone:</strong> {order.phone}
                         </p>
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p>
                           <strong>Items:</strong> {order.items.length} products
                         </p>
@@ -457,7 +462,7 @@ export function OrderManagement() {
                       </div>
                     </div>
 
-                    <div className="mt-3 flex space-x-2">
+                    <div className="mt-3 flex flex-wrap gap-2">
                       {order.status === "pending" && (
                         <Button
                           size="sm"
@@ -466,9 +471,9 @@ export function OrderManagement() {
                             updateOrderStatus(order.id, "confirmed")
                           }}
                           disabled={loading}
-                          className="bg-blue-600 hover:bg-blue-700 rounded-lg"
+                          className="bg-blue-600 hover:bg-blue-700 rounded-lg text-xs sm:text-sm flex-1 min-w-0 sm:flex-initial"
                         >
-                          {loading ? 'Updating...' : 'Confirm Order'}
+                          {loading ? 'Updating...' : 'Confirm'}
                         </Button>
                       )}
                       {order.status === "confirmed" && (
@@ -479,9 +484,9 @@ export function OrderManagement() {
                             updateOrderStatus(order.id, "delivered")
                           }}
                           disabled={loading}
-                          className="bg-green-600 hover:bg-green-700 rounded-lg"
+                          className="bg-green-600 hover:bg-green-700 rounded-lg text-xs sm:text-sm flex-1 min-w-0 sm:flex-initial"
                         >
-                          {loading ? 'Updating...' : 'Mark Delivered'}
+                          {loading ? 'Updating...' : 'Delivered'}
                         </Button>
                       )}
                       <Button
@@ -491,10 +496,10 @@ export function OrderManagement() {
                           e.stopPropagation()
                           setSelectedOrder(order)
                         }}
-                        className="rounded-lg"
+                        className="rounded-lg text-xs sm:text-sm flex-1 min-w-0 sm:flex-initial"
                       >
-                        <Eye className="w-4 h-4 mr-1" />
-                        View Details
+                        <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 shrink-0" />
+                        Details
                       </Button>
                       <Button
                         variant="destructive"
@@ -504,9 +509,9 @@ export function OrderManagement() {
                           deleteOrder(order.id)
                         }}
                         disabled={loading}
-                        className="rounded-lg"
+                        className="rounded-lg text-xs sm:text-sm flex-1 min-w-0 sm:flex-initial"
                       >
-                        <Trash2 className="w-4 h-4 mr-1" />
+                        <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 shrink-0" />
                         Delete
                       </Button>
                     </div>
@@ -518,16 +523,16 @@ export function OrderManagement() {
           </Card>
         </div>
 
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 min-w-0">
           {selectedOrder ? (
-            <Card className="sticky top-24 rounded-xl">
-              <CardHeader>
-                <CardTitle>Order Details</CardTitle>
+            <Card className="rounded-xl lg:sticky lg:top-24">
+              <CardHeader className="px-4 sm:px-6">
+                <CardTitle className="text-base sm:text-lg">Order Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 px-4 sm:px-6 pb-6">
                 <div>
-                  <h4 className="font-semibold mb-2">Order Information</h4>
-                  <div className="space-y-1 text-sm">
+                  <h4 className="font-semibold mb-2 text-sm sm:text-base">Order Information</h4>
+                  <div className="space-y-1 text-xs sm:text-sm">
                     <p>
                       <strong>Order ID:</strong> {selectedOrder.id}
                     </p>
@@ -542,8 +547,8 @@ export function OrderManagement() {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-2">Customer Details</h4>
-                  <div className="space-y-1 text-sm">
+                  <h4 className="font-semibold mb-2 text-sm sm:text-base">Customer Details</h4>
+                  <div className="space-y-1 text-xs sm:text-sm break-words">
                     <p>
                       <strong>Name:</strong> {selectedOrder.customerName}
                     </p>
@@ -567,10 +572,10 @@ export function OrderManagement() {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-2">Order Items</h4>
+                  <h4 className="font-semibold mb-2 text-sm sm:text-base">Order Items</h4>
                   <div className="space-y-2">
                     {selectedOrder.items.map((item, index) => (
-                      <div key={index} className="flex justify-between text-sm">
+                      <div key={index} className="flex justify-between gap-2 text-xs sm:text-sm min-w-0">
                         <div>
                           <p className="font-medium">{item.productName}</p>
                           <p className="text-gray-600">Qty: {item.quantity}</p>
@@ -579,7 +584,7 @@ export function OrderManagement() {
                       </div>
                     ))}
                   </div>
-                  <div className="border-t pt-2 mt-2 space-y-1 text-sm">
+                  <div className="border-t pt-2 mt-2 space-y-1 text-xs sm:text-sm">
                     {typeof selectedOrder.subtotal === 'number' && (
                       <div className="flex justify-between">
                         <span>Subtotal</span>
@@ -604,7 +609,7 @@ export function OrderManagement() {
                     <Button
                       onClick={() => updateOrderStatus(selectedOrder.id, "confirmed")}
                       disabled={loading}
-                      className="w-full bg-blue-600 hover:bg-blue-700 rounded-lg"
+                      className="w-full bg-blue-600 hover:bg-blue-700 rounded-lg text-sm"
                     >
                       {loading ? 'Updating...' : 'Confirm Order'}
                     </Button>
@@ -613,7 +618,7 @@ export function OrderManagement() {
                     <Button
                       onClick={() => updateOrderStatus(selectedOrder.id, "delivered")}
                       disabled={loading}
-                      className="w-full bg-green-600 hover:bg-green-700 rounded-lg"
+                      className="w-full bg-green-600 hover:bg-green-700 rounded-lg text-sm"
                     >
                       {loading ? 'Updating...' : 'Mark as Delivered'}
                     </Button>
@@ -622,7 +627,7 @@ export function OrderManagement() {
                     variant="destructive"
                     onClick={() => deleteOrder(selectedOrder.id)}
                     disabled={loading}
-                    className="w-full rounded-lg"
+                    className="w-full rounded-lg text-sm"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
                     {loading ? 'Deleting...' : 'Delete Order'}
@@ -632,9 +637,9 @@ export function OrderManagement() {
             </Card>
           ) : (
             <Card className="rounded-xl">
-              <CardContent className="p-8 text-center text-gray-500">
-                <Eye className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>Select an order to view details</p>
+              <CardContent className="p-6 sm:p-8 text-center text-gray-500">
+                <Eye className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-gray-300" />
+                <p className="text-sm sm:text-base">Select an order to view details</p>
               </CardContent>
             </Card>
           )}
@@ -643,8 +648,8 @@ export function OrderManagement() {
 
       {/* Delete All Confirmation Dialog */}
       {showDeleteAllConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-96 mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md mx-auto">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2 text-red-600">
                 <AlertTriangle className="w-5 h-5" />
