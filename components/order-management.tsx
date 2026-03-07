@@ -213,6 +213,9 @@ export function OrderManagement() {
     setFilterStatus("")
   }
 
+  const formatItemNames = (order: Order) =>
+    order.items.map((i) => `${i.productName} (${i.quantity})`).join(", ")
+
   const exportToExcel = () => {
     const rows = filteredOrders.map((order) => ({
       "Order ID": order.id,
@@ -221,6 +224,7 @@ export function OrderManagement() {
       Location: order.location,
       Status: order.status,
       Date: format(parseISO(order.createdAt), "yyyy-MM-dd HH:mm"),
+      "Item Names": formatItemNames(order),
       Items: order.items.length,
       Subtotal: order.subtotal ?? "",
       "Delivery Fee": order.deliveryFee ?? "",
@@ -243,15 +247,17 @@ export function OrderManagement() {
       order.customerName,
       order.phone,
       format(parseISO(order.createdAt), "MM/dd/yyyy"),
+      formatItemNames(order),
       order.status,
       `UGX ${order.total.toLocaleString()}`,
     ])
     autoTable(doc, {
       startY: 28,
-      head: [["Order ID", "Customer", "Phone", "Date", "Status", "Total"]],
+      head: [["Order ID", "Customer", "Phone", "Date", "Item Names", "Status", "Total"]],
       body: tableData,
       theme: "grid",
       headStyles: { fillColor: [34, 197, 94] },
+      columnStyles: { 4: { cellWidth: "auto", overflow: "linebreak" } },
     })
     doc.save(`orders-${format(new Date(), "yyyy-MM-dd")}.pdf`)
   }
