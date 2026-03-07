@@ -1,0 +1,124 @@
+# name: Deploy Fullstack App to VPS
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Deploy to VPS via SSH
+#         timeout-minutes: 30
+#         uses: appleboy/ssh-action@v1.0.0
+#         with:
+#           host: 72.61.154.68
+#           username: root
+#           command_timeout: 30m
+#           key: |
+#             -----BEGIN OPENSSH PRIVATE KEY-----
+#             b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAACFwAAAAdzc2gtcn
+#             NhAAAAAwEAAQAAAgEAok+Ru59UhVULAOl7T4ch1AC0rKVxKFGJr/zdqRFNFz0soEoIo0Hg
+#             QC3Ak/Xx6bO5vJfsyJgdXDYor2AXwRFcAyKhDWMEr/Pw4Cob8P9crTidM7+ONG+0Rbnw5k
+#             wgcf0gFEikgtszUpjT3qNWnGZqz+uMb5uvDIuGN55NMFT+KTMkolWgM4gIfU055JEbrpJa
+#             fRW49ZDLNhYJXOnTY4CerAnyHsKA4MiPb/ifYvE2LYpoao30Pc6giORI3cYkkknlh8fGJK
+#             3NtSPyC+ooopSCArSvhe2ChcestAkNEDD0XArBoteGGA+cJjpQbd0K9qtyoNSDZp2H//Og
+#             DJk60cKpK4FOg9/FVc0g/kuLAvM43RwqHDqJgqcHaZ47XjfQHd2VZnHUj5Q6H1cjXpKnOl
+#             cnbt0G6BTgw6m+YMGBBBDyGFGOqWX3rIgJnSWb9JdbK8mu930wlowJETmjF1eiumJSstqb
+#             WVoNn/mIzmxf+Mya6T/r01qonEnFGAUgNcMWA1pxpEbLIwY3Ftxh6qaoD5m35ZYZeGJRW0
+#             leg7LUHdlCa9hjS0gBD4OkhesOrobKtfMd5Ueog1ON7A9SZlOGsA+LDvWXaWN0ZVWaQCaE
+#             oYPc6dvqWCp9n2pmHMb836E1ReyDqrmfB0Zo50rvtDXhbwSVyzZBhOroNembYgxDGAuhca
+#             8AAAdAMsX7KTLF+ykAAAAHc3NoLXJzYQAAAgEAok+Ru59UhVULAOl7T4ch1AC0rKVxKFGJ
+#             r/zdqRFNFz0soEoIo0HgQC3Ak/Xx6bO5vJfsyJgdXDYor2AXwRFcAyKhDWMEr/Pw4Cob8P
+#             9crTidM7+ONG+0Rbnw5kwgcf0gFEikgtszUpjT3qNWnGZqz+uMb5uvDIuGN55NMFT+KTMk
+#             olWgM4gIfU055JEbrpJafRW49ZDLNhYJXOnTY4CerAnyHsKA4MiPb/ifYvE2LYpoao30Pc
+#             6giORI3cYkkknlh8fGJK3NtSPyC+ooopSCArSvhe2ChcestAkNEDD0XArBoteGGA+cJjpQ
+#             bd0K9qtyoNSDZp2H//OgDJk60cKpK4FOg9/FVc0g/kuLAvM43RwqHDqJgqcHaZ47XjfQHd
+#             2VZnHUj5Q6H1cjXpKnOlcnbt0G6BTgw6m+YMGBBBDyGFGOqWX3rIgJnSWb9JdbK8mu930w
+#             lowJETmjF1eiumJSstqbWVoNn/mIzmxf+Mya6T/r01qonEnFGAUgNcMWA1pxpEbLIwY3Ft
+#             xh6qaoD5m35ZYZeGJRW0leg7LUHdlCa9hjS0gBD4OkhesOrobKtfMd5Ueog1ON7A9SZlOG
+#             sA+LDvWXaWN0ZVWaQCaEoYPc6dvqWCp9n2pmHMb836E1ReyDqrmfB0Zo50rvtDXhbwSVyz
+#             ZBhOroNembYgxDGAuhca8AAAADAQABAAACAEoPpJ/IA/kS5QJ1hx6yumzSJZ7hntCW5Ay5
+#             hSswCc0gzMwW+/oChSDDv6vD/a51o7q6WADv5/W7gLUFU9F06ldD5dkF5Y2j8bVXgYhl/R
+#             PNUW3bajfjAI8QWSu8cNGSfqDCxM4w1ypJMePVBCA5W2OkR2Bl2WoQAB5AzVfQcGi8PWsV
+#             RxQ8biM+qbvxun/dqAyLbOogN5lmVL9gsmQkvEIkB6ahec0XttuQxqmPBvmgviRgwaGyNu
+#             4/vD/1uZpGvcVHEtKJu+N7k2Z8Yi5NNUWmzLB/v57rjZJYzu0kaVvWTKTRUw6HkOigkzKO
+#             OgJ0GMnqLksUdooD0HPvNzefazEEk1EvI0RpS7CqVY8zh0zDz/zez2OOQvv1JCjRa3tB34
+#             6Xg5z6sGhGq9ol3u7GHSxjGg/oJ8oxJfAsCm/Al7ISp0V54k1EZlTEaAueWuHxkW8FjV8j
+#             sYskt53apsc+qiMuI7/kNKfJnGdAD99H8SahPFrL6LJoPP/4awmdrYEuCfwLgl3esYiAnu
+#             6M/Czsz8oMdLedL5ym1YXCqU4At9mWdU5JKvLu2E/U+hgh3nnDBk+Q7fYLz9bU2fD/tAYe
+#             wJgalhAfDOvBpNA8zJuAl4Dm5ReZf4kE1rjE7Y3/0kHMZm7jDlLt4uZp96JSDSlNFO+1mM
+#             bCuHrMfq/b0grjJqCBAAABAQDBxqwZUGY267+FCZv4+MOa/GvTueCROfi9GpaoJheE2vde
+#             3nb+PxfGWlpWLy/Efz17J8pSzggQg4hNq6DiEPCdqJpRn3Gm/WyoojTPScfIk0oUL6NSxC
+#             ZnP2sz2RxPubfjKkJL6BjAyZG/WHLdlh4PJKEtgJ7YZkPZmdhTNTpyNzYU4+XV8WtGvegu
+#             Fq9KcSTM3pusDNbOghuazYfBjaX3s5qNMvGG2hj7+edoNSxk0qlCol40dHVrFyd+ECN7g9
+#             +uU9IMIl8XXnqzTo/zQWV+jKXG73w3mgjDywdEcxIZacp4F+Z7HB1AaOOtihleXcgCGRfn
+#             NohMb8QaKJp1cgB6AAABAQDUHgbwRg8ELyKY5tYBPIjMKufARzeIPaAFKFCffd98EjN9pt
+#             V+hwGfhLJxYuG0BLVoG32yyXC6tWjg8gNPO/u3QJbwu+RGlulRab8BKSDkXUZjP/NhnUsX
+#             e2CL1aO+8FS/dFNbPqFVhal70xVYsqc4TFkqYHy+u2sYG7J5sWPE4WujcY6hdNEoDJYUCF
+#             ulfHuwWlBd9IpuvFFreVXHsLfEmmPlCUGX22mXGUVIA+oRYM6w9vmMAULzY6zp1bJrvgFI
+#             JeCGWwwxScT05WJoShGkV00RvmBEhiH/Zd1uk/eManGWknaTmfySbm11u4MWIwP1MZa857
+#             0BbeR6SBIDZEt1AAABAQDD47wO9mlUyrxqrYuDzgfJhL8aaSxSXty0VK4T+Egg6AGVYBgP
+#             1Q9GTxW4Z+tKaaeC1eKgEsinH7G7ExRi3P0lzJB2Q0Ek7Vm/ITmBC9Mtv4m7DK0n0AwShE
+#             js6Jp+zQ1+8ghBeY8GDFBj0cp0/9RLiQxEP+tZUnlgzSisf+P4oqBHUY4VdRh8P48YN2H3
+#             0kw07UfqRq3e/4DUlJPvAI/uZqeSJObEGsHQG2CDetCGpuBsQONGeMbtxDaFukFHstVJVT
+#             oPqrg2Y8czBM7zsGrta+HhWXSHibU8PE7soql5GAfiAu0Mv60cPK9zcs1voLD5fYn0evI4
+#             osT6v2IrbXgTAAAACWdpdGh1Yi1jaQE=
+#             -----END OPENSSH PRIVATE KEY-----
+#           port: 22
+#           script_stop: true
+#           debug: true
+#           script: |
+#             echo "🚀 Starting deployment to VPS..."
+
+#             cd /var/www/grocerynowstore
+
+#             echo "🔄 Pulling latest code..."
+#             git reset --hard
+#             git pull origin main
+
+#             echo "⚙️ Writing backend environment variables..."
+#             cat > backend/.env <<EOF
+#             DB_HOST=${{ secrets.DB_HOST }}
+#             DB_USER=${{ secrets.DB_USER }}
+#             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+#             DB_NAME=${{ secrets.DB_NAME }}
+#             DB_PORT=${{ secrets.DB_PORT }}
+#             PORT=${{ secrets.BACKEND_PORT }}
+#             MARZPAY_API_URL=${{ secrets.MARZPAY_API_URL }}
+#             MARZPAY_API_CREDENTIALS=${{ secrets.MARZPAY_API_CREDENTIALS }}
+#             APP_URL=${{ secrets.APP_URL }}
+#             TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
+#             TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}
+#             EOF
+
+#             echo "📦 Installing frontend dependencies..."
+#             npm ci --prefer-offline
+
+#             echo "🏗️ Building Next.js app..."
+#             npm run build
+
+#             echo "📦 Installing backend dependencies..."
+#             cd backend
+#             npm ci --prefer-offline --only=production
+
+#             echo "🔁 Stopping and cleaning up old processes..."
+#             pm2 delete grocery-frontend grocery-backend 2>/dev/null || true
+#             sudo fuser -k 3000/tcp 2>/dev/null || true
+#             sudo fuser -k 4000/tcp 2>/dev/null || true
+
+#             echo "🚀 Starting apps with PM2..."
+#             cd /var/www/grocerynowstore
+#             pm2 start npm --name grocery-frontend -- start
+#             cd backend
+#             pm2 start index.js --name grocery-backend --update-env
+
+#             echo "💾 Saving PM2 process list..."
+#             pm2 save
+
+#             echo "✅ Deployment completed successfully!"
