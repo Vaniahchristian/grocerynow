@@ -20,7 +20,7 @@ const nextConfig = {
   },
   images: {
     unoptimized: false,
-    domains: ['72.61.154.68', 'via.placeholder.com'],
+    domains: ['187.124.35.119', 'via.placeholder.com'],
     formats: ['image/webp', 'image/avif'],
     remotePatterns: [
       {
@@ -29,25 +29,22 @@ const nextConfig = {
       },
       {
         protocol: 'http',
-        hostname: '72.61.154.68',
+        hostname: '187.124.35.119',
       },
       {
         protocol: 'https',
-        hostname: '72.61.154.68',
+        hostname: '187.124.35.119',
       },
     ],
   },
   compiler: {
-    removeConsole:
-      process.env.NODE_ENV === 'production'
-        ? { exclude: ['error', 'warn'] }
-        : false,
+    removeConsole: false,
   },
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://72.61.154.68:4000/api/:path*',
+        destination: 'http://187.124.35.119:4000/api/:path*',
       },
     ]
   },
