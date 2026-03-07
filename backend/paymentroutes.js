@@ -10,6 +10,16 @@ const TELEGRAM_CHAT_IDS = (process.env.TELEGRAM_CHAT_ID || '')
   .map((id) => id.trim())
   .filter(Boolean);
 
+// Startup diagnostic (safe: no secrets logged)
+const credsSet = Boolean(MARZPAY_API_CREDENTIALS && MARZPAY_API_CREDENTIALS.length > 0);
+console.log('[Payment] Config at startup:', {
+  MARZPAY_API_CREDENTIALS_set: credsSet,
+  MARZPAY_API_CREDENTIALS_length: MARZPAY_API_CREDENTIALS ? MARZPAY_API_CREDENTIALS.length : 0,
+  MARZPAY_API_URL,
+  APP_URL,
+  env_has_MARZPAY_API_CREDENTIALS: 'MARZPAY_API_CREDENTIALS' in process.env,
+});
+
 function sendTelegramMessage(text) {
   if (!TELEGRAM_BOT_TOKEN || TELEGRAM_CHAT_IDS.length === 0) return Promise.resolve();
   return Promise.all(
@@ -33,6 +43,22 @@ function generateReference() {
 
 export default (pool) => {
   const router = express.Router();
+
+  // GET /api/payments/config – safe diagnostic (no secrets), for investigating config issues
+  router.get('/payments/config', (_req, res) => {
+    const credsSet = Boolean(MARZPAY_API_CREDENTIALS && MARZPAY_API_CREDENTIALS.length > 0);
+    const payload = {
+      payment_configured: credsSet,
+      MARZPAY_API_CREDENTIALS_set: credsSet,
+      MARZPAY_API_CREDENTIALS_length: MARZPAY_API_CREDENTIALS ? MARZPAY_API_CREDENTIALS.length : 0,
+      MARZPAY_API_URL,
+      APP_URL,
+      webhook_url: `${APP_URL.replace(/\/$/, '')}/api/webhooks/marzpay`,
+      env_has_MARZPAY_API_CREDENTIALS: 'MARZPAY_API_CREDENTIALS' in process.env,
+    };
+    console.log('[Payment] GET /payments/config –', JSON.stringify(payload));
+    return res.json(payload);
+  });
 
   // POST /api/payments/collect – initiate MarzPay collection (mobile money)
   router.post('/payments/collect', async (req, res) => {
@@ -78,9 +104,16 @@ export default (pool) => {
       };
 
       if (!MARZPAY_API_CREDENTIALS) {
-        console.log('[Payment] Collect rejected – MARZPAY_API_CREDENTIALS empty');
+        const diag = {
+          MARZPAY_API_CREDENTIALS_length: 0,
+          MARZPAY_API_CREDENTIALS_in_env: 'MARZPAY_API_CREDENTIALS' in process.env,
+          MARZPAY_API_URL,
+          APP_URL,
+        };
+        console.warn('[Payment] Collect rejected – MARZPAY_API_CREDENTIALS missing or empty. Diagnostic:', JSON.stringify(diag));
         return res.status(503).json({
           error: 'Payment service not configured (MARZPAY_API_CREDENTIALS)',
+          _diagnostic: diag,
         });
       }
 
